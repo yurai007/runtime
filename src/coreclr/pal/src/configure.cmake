@@ -697,6 +697,11 @@ int main()
 set(CMAKE_REQUIRED_LIBRARIES)
 
 if(NOT CLR_CMAKE_HOST_ARCH_ARM AND NOT CLR_CMAKE_HOST_ARCH_ARM64)
+  if (CLR_CMAKE_TARGET_ARCH_RISCV64 AND CMAKE_CROSSCOMPILING)
+    unset(CMAKE_CROSSCOMPILING)
+    set(CMAKE_RESTORE_CROSSCOMPILING 1)
+  endif()
+
   set(CMAKE_REQUIRED_LIBRARIES pthread)
   check_cxx_source_runs("
   // This test case verifies the pthread process-shared robust mutex's cross-process abandon detection. The parent process starts
@@ -883,6 +888,11 @@ if(NOT CLR_CMAKE_HOST_ARCH_ARM AND NOT CLR_CMAKE_HOST_ARCH_ARM64)
       return result >= 0 ? result : 0;
   }" HAVE_FUNCTIONAL_PTHREAD_ROBUST_MUTEXES)
   set(CMAKE_REQUIRED_LIBRARIES)
+
+  if(CMAKE_RESTORE_CROSSCOMPILING)
+    set(CMAKE_CROSSCOMPILING)
+    unset(CMAKE_RESTORE_CROSSCOMPILING)
+  endif()
 endif()
 
 if(CLR_CMAKE_TARGET_OSX)
